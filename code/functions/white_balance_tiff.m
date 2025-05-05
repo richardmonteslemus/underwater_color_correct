@@ -1,0 +1,87 @@
+function white_balance_tiff(input_folder, output_folder, patch_rgb_path, selected_patch, Ref_expected)
+    % WHITE_BALANCE_TIFF applies white balancing to all TIFF images in a folder.
+    %
+    % Parameters:
+    %   input_folder  - Path to the folder containing uncorrected TIFF images
+    %   output_folder - Path to the folder where white-balanced images will be saved
+    %   patch_rgb_path - Path to the .mat file containing the patch RGB table
+    %   selected_patch - Name of the patch used for white balancing (e.g., 'gray3')
+    %   Ref_expected  - Expected reflectance for the selected patch (e.g., 0.40)
+    %
+    % Example:
+    %   white_balance_tiff('E:\input', 'E:\output', 'E:\patch_rgb.mat', 'gray3', 0.40);
+
+    % To verify you've chosen the right reflectance value uncomment the
+    % section titled VERIFY REFLECTANCE VALUE. This will cause the images
+    % to be displayed in addtion to being saved. once this occurs you can
+    % use the cursor data tip feauture to hover over patches like white and
+    % ensure the values are generally close to the expected value of 1. If
+    % they are across the images you selected then this is a good
+    % reflectance value. If theyre too low increase reflectance value and 
+    % vice versa. Ensure the images you selected to verify contain
+    % color charts and have the color chart at varied distances. This
+    % ensures the reflectance value can be applied broadly. 
+
+    % Create the output folder if it doesn't exist
+    if ~exist(output_folder, 'dir')
+        mkdir(output_folder);
+    end
+
+    % Load the .mat file containing the patch RGB table
+    loaded_patch_rgb = load(patch_rgb_path);
+    patch_rgb_table = loaded_patch_rgb.patch_rgb_table;
+
+    % Extract the measured RGB values for the selected patch
+    R_measured = patch_rgb_table{selected_patch, 'Red'};
+    G_measured = patch_rgb_table{selected_patch, 'Green'};
+    B_measured = patch_rgb_table{selected_patch, 'Blue'};
+
+    % Compute scaling factors for white balancing
+    w_r = Ref_expected / R_measured;
+    w_g = Ref_expected / G_measured;
+    w_b = Ref_expected / B_measured;
+
+    % Display scaling factors
+    fprintf('Scaling factors for %s: R=%.4f, G=%.4f, B=%.4f\n', selected_patch, w_r, w_g, w_b);
+
+    % Get a list of all TIFF images in the input folder
+    image_files = dir(fullfile(input_folder, '*.tif'));
+
+    % Loop through each image in the folder
+    for i = 1:length(image_files)
+        % Read the image
+        img_name = image_files(i).name;
+        img_path = fullfile(input_folder, img_name);
+        I2 = im2double(imread(img_path)); % Convert to double for calculations
+
+        % Apply white balancing
+        Y(:,:,1) = I2(:,:,1) * w_r; % Scale red channel
+        Y(:,:,2) = I2(:,:,2) * w_g; % Scale green channel
+        Y(:,:,3) = I2(:,:,3) * w_b; % Scale blue channel
+
+        % VERIFY REFLECTANCE VALUE
+
+        % figure;
+        % subplot(1,2,1);
+        % imshow(I2);
+        % title(['Original Image: ', img_name], 'Interpreter', 'none');
+        % 
+        % subplot(1,2,2);
+        % imshow(Y);
+        % title(['White Balanced Image: ', img_name], 'Interpreter', 'none');
+        % 
+        % % Pause to allow viewing before moving to the next image
+        % pause(1); % Adjust timing as needed
+
+        % Define output file path
+        output_path = fullfile(output_folder, img_name);
+
+        % Save the white-balanced image with the same name
+        imwrite(Y, output_path);
+
+        % Display progress
+        fprintf('Processed and saved: %s\n', img_name);
+    end
+
+    disp('White balancing complete for all images.');
+end
