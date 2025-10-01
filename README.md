@@ -1,4 +1,5 @@
-# Connolly Lab Underwater Color Correction Protocol
+# Underwater Color Correction Protocol for Digital Reef Images
+
 What the project does
 Why the project is useful
 How users can get started with the project
