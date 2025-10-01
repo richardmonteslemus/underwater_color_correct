@@ -1,5 +1,3 @@
-
-
 clear all; close all; clc;
 
 addpath(genpath('.'))
@@ -8,9 +6,15 @@ addpath(genpath('.'))
 
 % Read the CSV file
 tiff_file_data = readtable('E:\Colorimetry\Photos\Perlas\Contadora_28_August_2023\Contadora_28_Aug_2023_0to25\selected_color_charts.csv');
-
 % Extract the FileName column
-tiff_file_names = cellfun(@(x) [x, '.tif'], tiff_file_data.FileName, 'UniformOutput', false); % This will be a cell array of strings with the filename + .tif
+% tiff_file_names = cellfun(@(x) [x, '.tif'], tiff_file_data.FileName, 'UniformOutput', false); % This will be a cell array of strings with the filename + .tif
+tiff_file_names = tiff_file_data.FileName;
+
+for i = 1:length(tiff_file_names)
+    if ~endsWith(tiff_file_names{i}, '.tif')
+        tiff_file_names{i} = [tiff_file_names{i}, '.tif'];
+    end
+end
 
 % % Define the list of image files (adjust to add or remove files as needed)
 % tiff_file_names = {'233A0013.tif', '233A0037.tif', '233A0059.tif'};  % Add new files here
@@ -19,7 +23,6 @@ tiff_file_names = cellfun(@(x) [x, '.tif'], tiff_file_data.FileName, 'UniformOut
 base_dir_linear = 'E:\Colorimetry\Photos\Perlas\Contadora_28_August_2023\Contadora_28_Aug_2023_0to25\uncorrectedTiff';
 % Define the base directory of where the depth map folder is located
 base_dir_depth = 'E:\Colorimetry\Photos\Perlas\Contadora_28_August_2023\Contadora_28_Aug_2023_0to25\depth';
-
 % Define the save path for CSV files
 savePath = 'E:\Colorimetry\Photos\Perlas\Contadora_28_August_2023\Contadora_28_Aug_2023_0to25';
 if ~isfolder(savePath)
@@ -319,9 +322,9 @@ plot(depth, blue_bc, 'ob', 'LineWidth', 2); % Blue channel
 hold off;
 
 % Customize the plot
-xlabel('Distance (z)');
+xlabel('Distance between camera and object (meters)');
 ylabel('Backscatter');
-title('Backscatter vs Distance (z)');
+title('Backscatter vs Distance (meters)');
 legend({'Red Channel', 'Green Channel', 'Blue Channel'}, 'Location', 'best');
 grid on;
 

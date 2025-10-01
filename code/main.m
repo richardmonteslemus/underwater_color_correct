@@ -7,9 +7,9 @@
 clear;close;clc
 
 %% Ask the user for the working directory path
-default_workindir = fullfile('C:', 'Users', 'colorlab', 'Richard_lemus', 'stri_bleaching_project_local', 'Sea_Thru_Protocol', 'code');
+default_workindir = fullfile('E:','Colorimetry', 'Color_correction_protocol','code');
 fprintf('Default Working Directory is: %s\n', default_workindir);
-workingdir = input('Enter the full path to exiftool.exe (or press Enter to use default): ', 's');
+workingdir = input('Enter the full path to the code folder (or press Enter to use default): ', 's');
 if isempty(workingdir)
     workingdir = default_workindir;
 end
@@ -35,7 +35,7 @@ user_raw_path = input('Enter the full path to the raw images folder: ', 's');
 
 %% Ask user for the exiftool path
 fprintf('\n')
-default_exif_path = fullfile('C:', 'Users', 'colorlab', 'Richard_lemus', 'stri_bleaching_project_local', 'Sea_Thru_Protocol', 'code', 'exiftool.exe');
+default_exif_path = fullfile('E:','Colorimetry','Color_correction_protocol','code','exiftool.exe');
 fprintf('Default Exiftool Path is: %s\n', default_exif_path);
 exif_path = input('Enter the full path to exiftool.exe (or press Enter to use default): ', 's');
 
@@ -55,96 +55,8 @@ end
 % Agisoft. 
 preprocess_images(rawpath, exif_path);
 
-%% Save Image Exposure Metadata 
-parent_rawpath =  fileparts(rawpath);
+%% Save Image Metadata 
+parent_rawpath =  rawpath;
 mainfolder_metadata = fullfile(parent_rawpath,'dng');
 savePath_metadata = fullfile(parent_rawpath,'metadata.csv');
-
-saveImageData(mainfolder_metadata, savePath_metadata);
-
-%% The main script to run the photogrammetry image pre-processing workflow
-% Custom made for Neta!
-% DA Feb 26, 2024
-
-% The main script to run the photogrammetry image pre-processing workflow,
-% edited to automatically go through a directory assigned to rootdir and
-% one by one look for folders labeled "raw". After its found a raw folder it
-% runs the preprocess_images function on it and moves on to the next raw
-% folder until it has finished processing all of them in the given
-% directory. 
-% Script modified from the original version by Derya Akkaynak.
-% Updated to recursively search for raw folders and process them by Richie.
-
-% 
-% 
-% % Define the root directory to search for 'raw' folders
-% rootdir = 'D:';
-% 
-% % Find all folders named 'raw' recursively
-% rawFolders = findRawFolders(rootdir);
-% 
-% % Check if any 'raw' folders were found
-% if isempty(rawFolders)
-%     disp('No folders named "raw" were found.');
-%     return;
-% end
-% 
-% % Display the list of 'raw' folders found
-% disp('List of raw folders found:');
-% disp(rawFolders);
-% 
-% % Process each 'raw' folder
-% for i = 1:length(rawFolders)
-%     % Clear all variables except 'rawFolders', 'rootdir', and i , close figures, and clear command window
-%     clearvars -except rawFolders rootdir i; close all; clc;
-% 
-%     % Get the current 'raw' folder path
-%     rawpath = rawFolders{i};
-%     fprintf('Processing folder: %s\n', rawpath);
-% 
-%     % This is where the code is
-%     workingdir = "C:\Users\colorlab.IUI\stri_bleaching_project_local\s1_depth_maps\code";
-%     cd(workingdir);
-% 
-%     % Add all subfolders to the path
-%     addpath(genpath('.'));
-% 
-%     % Preprocess the images in the current 'raw' folder
-%     preprocess_images(rawpath);
-% 
-%     fprintf('Finished processing folder: %s\n', rawpath);
-% end
-% 
-% disp('All folders processed.');
-% 
-% % Function to find all folders named 'raw' recursively
-% function rawFolders = findRawFolders(rootdir)
-%     % Initialize a cell array to store paths to 'raw' folders
-%     rawFolders = {};
-% 
-%     % Get all files and folders in the root directory
-%     files = dir(rootdir);
-% 
-%     % Loop through each item
-%     for k = 1:length(files)
-%         % Skip '.' and '..' entries
-%         if strcmp(files(k).name, '.') || strcmp(files(k).name, '..')
-%             continue;
-%         end
-% 
-%         % If the item is a folder
-%         if files(k).isdir
-%             % Construct the full path
-%             fullpath = fullfile(files(k).folder, files(k).name);
-% 
-%             % If the folder is named 'raw', add it to the list
-%             if strcmp(files(k).name, 'raw')
-%                 rawFolders{end+1} = fullpath;
-%             else
-%                 % Recursively search subdirectories
-%                 subdirRawFolders = findRawFolders(fullpath);
-%                 rawFolders = [rawFolders, subdirRawFolders];
-%             end
-%         end
-%     end
-% end
+saveImageData(mainfolder_metadata, savePath_metadata,exif_path);

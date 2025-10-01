@@ -1,0 +1,81 @@
+
+clear all;close all;clc
+%% Load in images and scale file
+uncorrectedTiff_folder = 'E:\Colorimetry\Photos\Perlas\Contadora_28_August_2023\Contadora_28_Aug_2023_0to25\uncorrectedTiff';
+white_balanced_png_folder = 'E:\Colorimetry\Photos\Perlas\Contadora_28_August_2023\Contadora_28_Aug_2023_0to25\wb_png_test_t';
+path2scale = 'E:\Colorimetry\Photos\Perlas\Contadora_28_August_2023\Contadora_28_Aug_2023_0to25\gam_t_scale.csv';
+    % Create the output folder if it doesn't exist
+if ~exist(white_balanced_png_folder, 'dir')
+        mkdir(white_balnced_png_folder);
+end
+
+% Load the .mat file containing the patch RGB table
+scale_table = readtable(path2scale);
+scale_table.Filename = string(scale_table.Filename);
+scale_table.BaseName = erase(scale_table.Filename, '.dng'); 
+    
+% Get a list of all TIFF images in the input folder
+image_files = dir(fullfile(uncorrectedTiff_folder, '*.tif'));
+
+%% Loop through each image in the folder
+for i = 1:length(image_files)
+    % Read the image
+    img_name = image_files(i).name;
+    img_path = fullfile(uncorrectedTiff_folder, img_name);
+    I2 = im2double(imread(img_path));
+
+    % Convert image filename from .tif to .dng for lookup
+    base_name = erase(img_name, '.tif');
+
+    % Find the row in scale_table that matches the current image
+    row_idx = find(scale_table.BaseName == base_name, 1);
+    if isempty(row_idx)
+        warning('Filename %s not found in scale table. Skipping.', dng_name);
+        continue;
+    end
+
+    % Extract scaling factors
+    w_r = scale_table.red_pred(row_idx);
+    w_g = scale_table.green_pred(row_idx);
+    w_b = scale_table.blue_pred(row_idx);
+
+    % Apply white balancing
+    Y = zeros(size(I2));
+    Y(:,:,1) = I2(:,:,1) * w_r; % Red
+    Y(:,:,2) = I2(:,:,2) * w_g; % Green
+    Y(:,:,3) = I2(:,:,3) * w_b; % Blue
+    % Y = Y .^ (1/2.2);Gamma correction 
+    % Convert to 8-bit preserving details
+    Y = im2uint8(Y);
+
+    % % VERIFY REFLECTANCE VALUE
+    % figure;
+    % subplot(1,2,1);
+    % imshow(I2);
+    % title(['Original Image: ', img_name], 'Interpreter', 'none');
+    % 
+    % subplot(1,2,2);
+    % imshow(Y);
+    % title(['White Balanced Image: ', base_name], 'Interpreter', 'none');
+
+    % Change file extension to png
+    [~, base_name, ~] = fileparts(img_name);
+    output_filename = [base_name, '.png'];
+
+    output_path = fullfile(white_balanced_png_folder, output_filename);
+
+    % Save as PNG with optimized compression
+    imwrite(Y, output_path, 'BitDepth', 8, 'Compression', 'none');
+
+    % Display progress
+    fprintf('Processed and saved: %s\n', output_filename);
+end
+
+disp('White balancing complete for all images, saved as PNG.');
+
+%% Copy metadata to PNG files 
+
+dngPath = 'E:\Colorimetry\Photos\Perlas\Contadora_28_August_2023\Contadora_28_Aug_2023_0to25\dng';
+destinationPath = 'E:\Colorimetry\Photos\Perlas\Contadora_28_August_2023\Contadora_28_Aug_2023_0to25\wb_png_test_t';
+exif_path = 'E:\Colorimetry\Color_correction_protocol\code\exiftool.exe';
+copyMetadata_dng2png(dngPath,destinationPath, exif_path)

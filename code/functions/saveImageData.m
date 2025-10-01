@@ -1,67 +1,78 @@
-%% New function requiring less inputs, but outputting same results as Old Function but outputting a CSV file
 
-function saveImageData(mainfolder, savePath)
-    % Get a list of only .dng images in the folder
+function saveImageData(mainfolder, savePath, exiftoolPath)
+    % Optimized version using a single ExifTool call for speed
+
+    % Get list of DNG files
+    % files = [dir(fullfile(mainfolder, '*.dng')); dir(fullfile(mainfolder, '*.DNG'))];
     files = dir(fullfile(mainfolder, '*.dng'));
-
-    % Check if there are any .dng images
     if isempty(files)
-        error('No .dng images found in the specified folder.');
+        error('No .dng or .DNG images found in the specified folder.');
     end
 
-    % Open the CSV file for writing
-    fid = fopen(savePath, 'w+');
+    % === 1. Use ExifTool once to extract DateTimeOriginal for all files ===
+    oldDir = pwd;
+    cd(mainfolder);  % change to mainfolder to avoid full paths in output
+    system(sprintf('"%s" -DateTimeOriginal -json *.dng *.DNG > temp_metadata.json', exiftoolPath));
+    cd(oldDir);  % return to original directory
 
-    % Write CSV header
-    fprintf(fid, 'Filename,ExposureTime,FNumber,ISO\n');
+    % Read and parse JSON
+    jsonPath = fullfile(mainfolder, 'temp_metadata.json');
+    if ~isfile(jsonPath)
+        error('ExifTool did not produce metadata JSON file.');
+    end
+    jsonText = fileread(jsonPath);
+    exifData = jsondecode(jsonText);
+
+    % Build a map from filename to DateTimeOriginal
+    timeMap = containers.Map();
+    for k = 1:numel(exifData)
+        [~, name, ext] = fileparts(exifData(k).SourceFile);
+        key = [name ext];  % e.g. '233A5730.dng'
+        if isfield(exifData(k), 'DateTimeOriginal')
+            timeMap(key) = exifData(k).DateTimeOriginal;
+        end
+    end
+
+    % === 2. Write metadata to CSV ===
+    fid = fopen(savePath, 'w');
+    if fid == -1
+        error('Could not open file: %s', savePath);
+    end
+    fprintf(fid, 'Filename,Time,ExposureTime,FNumber,ISO,Seconds_since_midnight\n');
 
     for i = 1:numel(files)
-        info = imfinfo(fullfile(mainfolder, files(i).name));
-        exposure = info(1).DigitalCamera.ExposureTime;
-        f = info(1).DigitalCamera.FNumber;
-        iso = info(1).DigitalCamera.ISOSpeedRatings;
+        filename = files(i).name;
+        fullPath = fullfile(mainfolder, filename);
 
-        % Write data as a CSV row
-        fprintf(fid, '%s,%.6f,%.1f,%d\n', files(i).name, exposure, f, iso);
+        % Look up time
+        if ~isKey(timeMap, filename)
+            warning('Missing DateTimeOriginal for %s. Skipping.', filename);
+            continue;
+        end
+        time = timeMap(filename);
+
+        % Get camera metadata using imfinfo
+        info = imfinfo(fullPath);
+        camInfo = info(1).DigitalCamera;
+
+        exposure = camInfo.ExposureTime;
+        fNumber = camInfo.FNumber;
+        iso = camInfo.ISOSpeedRatings;
+
+        % === Add Seconds_since_midnight column ===
+        time_dt = datetime(time, 'InputFormat', 'yyyy:MM:dd HH:mm:ss');
+        midnight = dateshift(time_dt, 'start', 'day');
+        secondsSinceMidnight = seconds(time_dt - midnight);
+
+        % Write to CSV
+        fprintf(fid, '%s,%s,%.6f,%.1f,%d,%.0f\n', filename, time, exposure, fNumber, iso, secondsSinceMidnight);
     end
 
     fclose(fid);
+
+    % Clean up temp file
+    delete(jsonPath);
+
     fprintf('Metadata successfully saved to %s\n', savePath);
+    % delete(fullfile(mainfolder_metadata, 'temp_metadata.json'));
 end
-
-
-%% Examples of how to use functions
-% 
-%% New Function 
-% mainfolder_metadata = 'E:\Colorimetry\Photos\Coiba\Canales_15_January_2024\Canales_15_January_2024_0to25\dng_creation\dng';
-% savePath_metadata = 'E:\Colorimetry\Photos\Coiba\Canales_15_January_2024\Canales_15_January_2024_0to25\dng_creation\metadata.csv';
-% 
-% saveImageData(mainfolder_metadata, savePath_metadata);
-
-%% Old function requiring more inputs and outputting TXT file 
-% function saveImageData(mainfolder,files,savePath)
-% 
-% fid = fopen(savePath,'w+');
-% 
-% for i = 1:numel(files)
-%     info = imfinfo(fullfile(mainfolder,files(i).name));
-%     exposure = info(1).DigitalCamera.ExposureTime;
-%     f = info(1).DigitalCamera.FNumber;
-%     iso = info(1).DigitalCamera.ISOSpeedRatings;
-%     fprintf(fid,[files(i).name,'\t',num2str(exposure),'\t',num2str(f),'\t',num2str(iso),'\n']);
-% end
-% 
-% fclose(fid);
-
-%% Old Function
-% % Define the folder containing the DNG images
-% mainfolder_metadata = 'E:\Colorimetry\Photos\Coiba\Canales_15_January_2024\Canales_15_January_2024_0to25\dng_creation\dng';
-% 
-% % Get a list of all DNG files in the folder
-% files_metadata = dir(fullfile(mainfolder_metadata, '*.dng'));
-% 
-% % Define the path where you want to save the CSV file
-% savePath_metadata = 'E:\Colorimetry\Photos\Coiba\Canales_15_January_2024\Canales_15_January_2024_0to25\dng_creation\metadata_2.txt';
-% 
-% % Call the function with the required inputs
-% saveImageData(mainfolder_metadata, files_metadata, savePath_metadata);

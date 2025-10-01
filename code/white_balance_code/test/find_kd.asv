@@ -1,0 +1,81 @@
+% This is the main script for finding Kd using underwater images, depth,
+% and the spectral response of a camera. The paper that informed this
+% script can be found at https://ieeexplore.ieee.org/document/10682259 
+
+% We will primarily use the underwater image formation model 
+% Ic = sum(p_reflectance(lambda)(daylight_spec(lambda))(exp(-Kd_type2(lambda)*depths))(S_cam(lambda)))(delta_lamda)
+
+%% Obtaining Measured RGB values
+% First, we will obtained our measured RGB values. These will usually be 
+% obtained from underwater images, but for this current script we will 
+% calculate it using known information about the scene such as depth, the 
+% Kd value of a water type from Jerlov's water types, the camera 
+% sensivities, known reflectance values, etc.
+
+% Then we will generate a model that tests different Kd values and minimize 
+% the angle between the measured RGB vector values and the predicted ones 
+% produced by the model after inputting a Kd value. As the angle between 
+% the measured and predicted RGB values get minimized we expect a Kd curve
+% to be produced represents the water type of our scene. For the purposes
+% of this script it should match Jerlov's water type 2. 
+
+% Important Vocabulary 
+% Irradiance: Measure of light hitting a surface (W/m^2)
+
+% Reflectance: How much irradiance is reflected by an object (%)
+
+% Spectral Radiance: Irradiance after it has been reflected by an object, and
+% measured in a specfic direction. In other words spectral radiance 
+% quantifies how much light power (W) is flowing per unit area (m^2) per 
+% solid angle (per steradian), per wavelength in that specfic direction. 
+% (W/m^2/sr/nm) watts per square meter per steradian per nanometer
+
+% Camera Spectral Response: This the camera's sensitivity to spectral radiance per
+% R,G,B channel over wavelength. Mathematically this can be interpreted as
+% a weight assigned to each wavelength from the incoming spectral radiance. 
+% It has no units it represents a sensitivity to each wavlength per
+% channel. It contains a vector for each RGB channel across wavelength(nm).
+% The RGB curves are not relative to each other and act independently. 
+
+% Daylight Spectrum: This is a vector containing relative intensities for
+% every wavelength. I am using d65 for this example which represents a
+% daylight spectrum around mid day in temperate latitudes (Northern
+% Europe). The intensities are relative to 560 nm which has an intensity of
+% 100. The entire spectrum is scaled acording to this value. 
+
+
+
+
+
+%% Terms 
+% Ic = Intensity for each red, green, blue channel. This
+% vector corresponds to one pixel.
+
+lambda = (400:10:700)'; % Range of wavelengths we are working with in nm
+delta_lambda = lambda(2)-lambda(1);
+Jerlov_Kd = importdata('test/Jerlov_Kd.csv'); % Known Kds for water types 
+Kd_type2 = Jerlov_Kd(:,2); % Selected water type 2 Kd
+depths = [1, 2, 5, 7, 10]; % Different depths the image was taken at for our calculation 
+
+S_cam = readtable('Canon-EOS-5D-Mark-IV.csv'); % Camera spectral response https://color-lab-eilat.github.io/Spectral-sensitivity-estimation-web/
+S_cam_r = S_cam.red; % Camera's spectral sensitivity to red wavelength 
+S_cam_g = S_cam.green; % Camera's spectral sensitivity to green wavelength 
+S_cam_b = S_cam.blue; % Camera's spectral sensitivity to blue wavelength 
+
+daylight_spec_65 = importdata('test/illuminant-D65.csv'); % Daylight spectrum at around noon, often considered the average daylight spectrum
+daylight_spec = interp1(daylight_spec_65.data(:,1), daylight_spec_65.data(:,2), lambda, "linear", "extrap"); %Creates a smooth curve for the daylight spectrum given our range of interest
+
+DGK_reflectance = importdata('test/DGKcolorchart_reflectances.csv'); % Reflectance data measured by Derya 
+DGK_gray_col = 3:7; % Columns from DGK reflectance that corresponding to gray patches we're interested in 
+P_reflectance = DGK_reflectance.data(:,DGK_gray_col); % reflectance values for gray patches gray1 - black 
+
+%% Plots for Wavelength Dependent Functions 
+
+% Gray Patch Reflectance 
+figure;
+plot(lambda, P_reflectance, 'k-', 'LineWidth', 2);
+xlabel('Wavelength (nm)'); ylabel('Reflectance'); % Reflectance has no units here, it is a percentage of irradiance reflected back  
+title('Reflectance Spectrum (Gray Patches)');
+grid on;
+
+
