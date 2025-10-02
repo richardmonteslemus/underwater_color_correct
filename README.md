@@ -13,8 +13,10 @@ This repository was developed through a collaboration between the [COLOR Lab](ht
 - **/agisoft_scripts** – Agisoft Metashape automation scripts  
 
 ## Usage 
-**R** - mgcv, ggplot2, 
-**Matlab** - 
+**R** - mgcv, ggplot2, tidyr, dplyr, reshape2, plotly, glmmTMB, glue.
+**Python** - Metashape, sys, os, csv
+**Matlab** - [Image Processing Toolbox](https://www.mathworks.com/products/image-processing.html)
+
 Contact richard.montes.lemus@gmail.com for access to the step-by-step protocol that accompanies these scripts. 
 (Here you can describe how to run the scripts, dependencies, or include a step-by-step protocol.)  
 
