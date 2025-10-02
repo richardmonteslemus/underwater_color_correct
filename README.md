@@ -2,7 +2,7 @@
 
 The scripts in this repository acompany a protocol for color correcting digital underwater reef images obtained by the [Connolly Lab](https://striresearch.si.edu/connolly-lab/). 
 
-The purpose of these scripts are to produce reef images free from water distortion. Inconsistent water conditions vary the color of coral. This makes it challenging to establish a standard color threshold for bleached coral, thus making it difficult to compare bleaching rates across time and sites. The scripts in this protocol applying underwater colorimetry methods to recover true reef colors and adresses this issue. 
+The purpose of these scripts are to produce reef images free from water distortion. Inconsistent water conditions vary the color of coral. This makes it challenging to establish a standard color threshold for bleached coral, thus making it difficult to compare bleaching rates across time and sites. The scripts in this protocol apply underwater colorimetry methods to recover true reef colors and adresses this issue. 
 
 
 
