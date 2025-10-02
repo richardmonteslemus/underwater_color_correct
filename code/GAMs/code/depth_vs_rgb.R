@@ -3,7 +3,7 @@ library(tidyr)
 library(dplyr)
 setwd( "E:/Colorimetry/Color_correction_protocol/code/GAMs")
 
-# Plot that checks is there is a relationship between RGB Pixel Intensity Value vs Depth
+# Plot that checks if there is a relationship between RGB Pixel Intensity Value vs Depth
 # Results so far have found no relationship 
 
 wp_df <- read.csv("data/wp_rgb_scale_with_metadata.csv")
