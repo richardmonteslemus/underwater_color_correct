@@ -1,6 +1,6 @@
 # Underwater Color Correction Protocol for Digital Reef Images
 
-The scripts in this repository acompany a protocol for color correcting digital underwater reef images obtained by the (Connolly Lab)[https://striresearch.si.edu/connolly-lab/]. 
+The scripts in this repository acompany a protocol for color correcting digital underwater reef images obtained by the [Connolly Lab](https://striresearch.si.edu/connolly-lab/). 
 
 
 
