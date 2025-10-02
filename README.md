@@ -12,7 +12,8 @@ This repository was developed through a collaboration between the [COLOR Lab](ht
 - **/code** – main scripts for color correction  
 - **/agisoft_scripts** – Agisoft Metashape automation scripts  
 
-## Usage  
+## Usage 
+Contact richard.montes.lemus@gmail.com for access to the step-by-step protocol that accompanies these scripts. 
 (Here you can describe how to run the scripts, dependencies, or include a step-by-step protocol.)  
 
 ## Contact  
