@@ -1,7 +1,7 @@
 library(ggplot2)
 library(tidyr)
 library(dplyr)
-setwd( "E:/Colorimetry/Color_correction_protocol/code/GAMs")
+setwd( "E:/Colorimetry/underwater_color_correct/code/GAMs")
 
 # Plot that checks if there is a relationship between RGB Pixel Intensity Value vs Depth
 # Results so far have found no relationship 
