@@ -4,7 +4,7 @@ library(ggplot2)
 library(dplyr)
 
 # === Setup paths ===
-setwd("E:/Colorimetry/Color_correction_protocol/code/GAMs")
+setwd("E:/Colorimetry/underwater_color_correct/code/GAMs")
 savePath <- "E:/Colorimetry/Photos/Perlas/Contadora_28_August_2023/Contadora_28_Aug_2023_0to25"
 
 # === Load data ===
