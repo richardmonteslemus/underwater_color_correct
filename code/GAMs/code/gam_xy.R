@@ -4,7 +4,7 @@ library(ggplot2)
 library(reshape2)
 library(plotly)
 
-setwd("E:/Colorimetry/Color_correction_protocol/code/GAMs")
+setwd("E:/Colorimetry/underwater_color_correct/code/GAMs")
 
 channel_name <- "Blue"
 
