@@ -77,5 +77,5 @@ disp('White balancing complete for all images, saved as PNG.');
 
 dngPath = 'E:\Colorimetry\Photos\Perlas\Contadora_28_August_2023\Contadora_28_Aug_2023_0to25\dng';
 destinationPath = 'E:\Colorimetry\Photos\Perlas\Contadora_28_August_2023\Contadora_28_Aug_2023_0to25\wb_png_test_t';
-exif_path = 'E:\Colorimetry\Color_correction_protocol\code\exiftool.exe';
+exif_path = 'E:\Colorimetry\underwater_color_correct\code\exiftool.exe';
 copyMetadata_dng2png(dngPath,destinationPath, exif_path)
