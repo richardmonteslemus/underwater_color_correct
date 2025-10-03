@@ -7,7 +7,7 @@
 clear;close;clc
 
 %% Ask the user for the working directory path
-default_workindir = fullfile('E:','Colorimetry', 'Color_correction_protocol','code');
+default_workindir = fullfile('E:','Colorimetry', 'underwater_color_correct','code');
 fprintf('Default Working Directory is: %s\n', default_workindir);
 workingdir = input('Enter the full path to the code folder (or press Enter to use default): ', 's');
 if isempty(workingdir)
@@ -35,7 +35,7 @@ user_raw_path = input('Enter the full path to the raw images folder: ', 's');
 
 %% Ask user for the exiftool path
 fprintf('\n')
-default_exif_path = fullfile('E:','Colorimetry','Color_correction_protocol','code','exiftool.exe');
+default_exif_path = fullfile('E:','Colorimetry','underwater_color_correct','code','exiftool.exe');
 fprintf('Default Exiftool Path is: %s\n', default_exif_path);
 exif_path = input('Enter the full path to exiftool.exe (or press Enter to use default): ', 's');
 
