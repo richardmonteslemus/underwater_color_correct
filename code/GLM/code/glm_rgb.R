@@ -3,7 +3,7 @@ library(ggplot2)
 library(tidyr)
 library(dplyr)
 library(glmmTMB)
-setwd("E:/Colorimetry/Color_correction_protocol/code/GAMs")
+setwd("E:/Colorimetry/underwater_color_correct/code/GAMs")
 
 wp_df <- read.csv("data/wp_rgb_scale_with_metadata.csv")
 
