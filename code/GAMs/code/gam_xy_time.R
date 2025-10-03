@@ -1,6 +1,6 @@
 library(mgcv)
 library(ggplot2)
-setwd("E:/Colorimetry/Color_correction_protocol/code/GAMs")
+setwd("E:/Colorimetry/underwater_color_correct/code/GAMs")
 
 # This script uses a GAM that contains a smooth function with an interaction between x and y, 
 # and a smooth function for time to generate predicted white balance scaling factors. 
