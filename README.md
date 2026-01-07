@@ -21,5 +21,6 @@ For a detailed, step-by-step protocol that explains the use of this repository's
 
 ## Contact  
 For questions about this repository, please contact:  
-- richard.montes.lemus@gmail.com  
+- richard.montes.lemus@gmail.com
+  
 - GonzalezM2@si.edu  
